@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Suppliers Window – Boutique en ligne</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#fff;--soft:#f4f4f4;--card:#fff;--ink:#222;--mute:#6b6b6b;--line:#e6e6e6;--acc:#ff6347;--accd:#e5482d;--star:#f5b82e}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 Montserrat,system-ui,sans-serif}
+h1,h2,b,.pr{font-family:Poppins,Montserrat,system-ui,sans-serif}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:12px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.logo{font-weight:700;font-size:1.35rem;letter-spacing:-.5px}.logo i{color:var(--acc);font-style:normal}
+.sw{position:relative;flex:1 1 240px;max-width:420px;min-width:0}
+.sw input{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--line);background:#fff}
+#sug{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid var(--line);border-radius:8px;margin-top:4px;display:none;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+#sug button{display:block;width:100%;text-align:left;background:none;border:0;padding:10px 14px}
+#sug button:hover{background:var(--soft)}
+.cartbtn{background:none;border:0;padding:6px 4px;font-weight:600;display:flex;gap:8px;align-items:center}
+.cartbtn span.bd{background:var(--acc);color:#fff;border-radius:999px;min-width:22px;height:22px;display:inline-grid;place-items:center;font-size:.8rem}
+nav{background:var(--acc);display:flex;gap:4px;overflow-x:auto;padding:0 max(16px,calc((100% - 1200px)/2))}
+nav button{white-space:nowrap;border:0;background:none;color:#fff;font-weight:600;padding:16px 14px;border-bottom:3px solid transparent}
+nav button[aria-pressed=true]{border-bottom-color:#fff}
+.hero{max-width:1200px;margin:20px auto 0;padding:0 16px}
+.hero>div{background:var(--soft);border-radius:16px;padding:40px 32px}
+.hero h1{font-size:clamp(1.6rem,4vw,2.6rem);line-height:1.15;margin:0 0 8px;letter-spacing:-.5px}
+.hero p{color:var(--mute);margin:0 0 18px;max-width:46ch}
+main{max-width:1200px;margin:auto;padding:16px 16px 40px;display:grid;gap:24px;grid-template-columns:230px 1fr}
+@media (max-width:760px){main{grid-template-columns:1fr}.hero>div{padding:28px 20px}}
+aside{border:1px solid var(--line);border-radius:12px;padding:16px;align-self:start;display:grid;gap:12px}
+aside label{display:grid;gap:4px;font-size:.9rem;color:var(--mute)}
+aside input[type=range]{accent-color:var(--acc)}
+aside select{padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff}
+h1{font-size:1.5rem;margin:8px 0 4px}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.p{background:var(--card);border:1px solid transparent;border-radius:12px;overflow:hidden;text-align:left;padding:0;display:flex;flex-direction:column}
+.p:hover{border-color:var(--line);box-shadow:0 6px 20px rgba(0,0,0,.06)}
+.p .im{height:130px;display:grid;place-items:center;font-size:3.2rem;border-radius:12px}
+.p .t{padding:10px 4px;display:grid;gap:2px}
+.p .ct{color:var(--mute);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase}
+.pr{font-weight:700}.st{color:var(--star);letter-spacing:1px}.mu{color:var(--mute);font-size:.85rem}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:6px;padding:12px 20px;font-weight:600}
+.btn:hover{background:var(--accd)}.btn:disabled{background:#ccc}
+.btn.alt{background:none;border:1px solid var(--line);color:var(--ink)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:10;justify-content:flex-end;align-items:center}
+.ov.on{display:flex}
+.box{background:#fff;width:min(440px,100%);max-height:100%;overflow:auto;padding:20px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));border-radius:14px;margin:auto}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+.qty button{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:none}
+.steps{display:flex;gap:6px;margin:8px 0 14px}
+.steps i{flex:1;height:6px;border-radius:3px;background:var(--line)}.steps i.on{background:var(--acc)}
+.f{display:grid;gap:10px}.f input{padding:10px;border:1px solid var(--line);border-radius:8px;background:#fff}
+footer{background:#222;color:#fff;padding:28px 16px;text-align:center}
+footer .mu{color:#bbb}
+footer form{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+footer input{padding:10px;border-radius:6px;border:0;min-width:0;flex:1 1 200px;max-width:320px;color:#222}
+
+.logo{white-space:nowrap}
+.sw{display:flex;border:1px solid var(--line);border-radius:999px;background:#fff;max-width:520px}
+.sw input{border:0;background:none;border-radius:999px 0 0 999px;outline-offset:-2px}
+.sb{border:0;background:var(--acc);color:#fff;padding:0 18px;border-radius:0 999px 999px 0;display:grid;place-items:center}
+#sug{left:0;right:0}
+.ic{display:flex;gap:16px}
+.ic button{background:none;border:0;display:grid;justify-items:center;font-size:.75rem;gap:2px;position:relative;padding:2px 4px}
+.ic .bd{position:absolute;top:-4px;right:-2px;background:var(--acc);color:#fff;border-radius:999px;min-width:18px;height:18px;font:600 .7rem/18px Montserrat,sans-serif;text-align:center;font-style:normal}
+@media (max-width:640px){.sw{order:3;flex:1 1 100%;max-width:none}header{gap:10px}}
+nav{background:var(--acc)}
+.hero>div#hb{background:var(--soft);border-radius:14px;padding:36px 32px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;min-height:200px}
+.hero h1{text-transform:uppercase;margin:0}
+.hero h1 small{display:block;font-size:.55em;color:var(--mute);font-weight:600}
+.art{font-size:3.4rem;letter-spacing:6px;text-align:center}
+@media (max-width:640px){.hero>div#hb{grid-template-columns:1fr;padding:22px 18px;min-height:0}.art{font-size:2.2rem;order:-1}}
+.dots{display:flex;gap:6px;justify-content:center;margin-top:10px}
+.dots button{width:8px;height:8px;border-radius:99px;border:0;background:#d0d0d0;padding:0}.dots button.on{width:26px;background:var(--acc)}
+.fw{max-width:1200px;margin:22px auto 0;padding:0 16px}
+.fh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}.fh h2{margin:0;font-size:1.3rem}
+.lk{background:none;border:0;color:var(--acc);font-weight:600}
+.tm{display:flex;gap:4px;justify-content:center;padding:10px 0 0}
+.tm b{background:#222;color:#fff;border-radius:4px;font:600 .75rem/1 Montserrat,sans-serif;padding:6px 5px}.tm b.o{background:var(--acc)}
+.pr.red{color:#d92d20}.p s{margin-right:6px}
+main{grid-template-columns:1fr}
+aside{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;padding:12px 16px}
+aside label{flex:1 1 160px}
+.fc{max-width:1200px;margin:auto;display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));text-align:left}
+.fc p{margin:6px 0 0}.fc form{display:flex;gap:8px;margin-top:8px}.fc input{flex:1;min-width:0}
+.fcart{position:fixed;right:0;bottom:calc(90px + env(safe-area-inset-bottom,0px));z-index:6;background:var(--acc);color:#fff;border:0;border-radius:10px 0 0 10px;padding:12px 14px;font-weight:600}
+.hero>div.dots{background:none;padding:0;border-radius:0}
+</style>
+</head>
+<body>
+<header>
+<span class="logo">suppliers window<i>.</i></span>
+<div class="sw"><input id="q" type="search" placeholder="Rechercher un article" autocomplete="off" aria-label="Rechercher"><button class="sb" id="sbt" aria-label="Lancer la recherche"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button><div id="sug"></div></div>
+<div class="ic">
+<button data-soon="1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg><span>Compte</span></button>
+<button data-soon="1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-8-5-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0120 10c0 6-8 11-8 11z"/></svg><span>Favoris</span></button>
+<button id="cb"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h3l2.5 11h10L21 7H7"/><circle cx="10" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/></svg><span>Panier</span><em class="bd" id="cn">0</em></button>
+</div>
+</header>
+<nav id="nav" aria-label="Catégories"></nav>
+<div class="hero"><div id="hb"></div><div class="dots" id="hd"></div></div>
+<section class="fw"><div class="fh"><h2>Ventes flash</h2><button class="lk" data-c="Tous">Voir tout</button></div><div class="grid" id="fl"></div></section>
+<main>
+<aside>
+<label>Prix maximum : <b id="pv"></b><input id="pm" type="range" min="1000" max="60000" step="1000" value="60000"></label>
+<label>Note minimum<select id="rm"><option value="0">Toutes</option><option value="3">3 étoiles et +</option><option value="4">4 étoiles et +</option></select></label>
+<label>Trier par<select id="so"><option value="0">Pertinence</option><option value="1">Prix croissant</option><option value="2">Prix décroissant</option><option value="3">Mieux notés</option></select></label>
+</aside>
+<section><h1 id="h">Tous les articles</h1><div class="mu" id="cnt"></div><div class="grid" id="g" style="margin-top:12px"></div></section>
+</main>
+<footer><div class="fc">
+<div><b>Suppliers Window</b><p class="mu">Tout ce qu'il vous faut, au même endroit.</p></div>
+<div><b>Boutique</b><p class="mu">Mode<br>Électronique<br>Maison<br>Artisanat<br>Beauté</p></div>
+<div><b>Aide</b><p class="mu">Livraison<br>Retours<br>Contact</p></div>
+<div><b>Newsletter</b><form id="nl"><input type="email" required placeholder="Votre e-mail" aria-label="E-mail"><button class="btn">S'inscrire</button></form><div class="mu" id="nm"></div></div>
+</div></footer>
+<button class="fcart" id="cb2">Panier</button>
+<div class="ov" id="ov"><div class="box" id="bx"></div></div>
+<script src="config.js"></script>
+<script src="https://cdn.kkiapay.me/k.js"></script>
+<script>
+var P=[],cur=null;
+var cats=["Tous"].concat(P.map(function(x){return x.c}).filter(function(c,i,a){return a.indexOf(c)==i}));
+var cat="Tous",cart={},$=function(i){return document.getElementById(i)};
+try{cart=JSON.parse(localStorage.getItem("cart")||"{}")}catch(e){}
+var fmt=function(n){return n.toLocaleString("fr-FR")+" FCFA"};
+var stars=function(r){return "★".repeat(Math.round(r))+"☆".repeat(5-Math.round(r))};
+function save(){try{localStorage.setItem("cart",JSON.stringify(cart))}catch(e){}$("cn").textContent=Object.keys(cart).reduce(function(a,k){return a+cart[k]},0)}
+function nav(){$("nav").innerHTML=cats.map(function(c){return '<button aria-pressed="'+(c==cat)+'" data-c="'+c+'">'+(c=="Tous"?"☰ Toutes les catégories":c)+'</button>'}).join("")}
+function card(x,dl){var o=dl?'<s class="mu">'+fmt(Math.round(x.p*1.3/500)*500)+'</s>':'';return '<button class="p" data-id="'+x.id+'">'+(dl?'<div class="tm" data-t="'+dl+'"></div>':'')+'<div class="im">'+x.e+'</div><div class="t"><span class="ct">'+x.c+'</span><span>'+x.n+'</span><span class="st">'+stars(x.r)+' <span class="mu">('+x.v+')</span></span><span>'+o+'<span class="pr'+(dl?' red':'')+'">'+fmt(x.p)+'</span></span>'+(x.s<1?'<span class="mu">Épuisé</span>':x.s<6?'<span class="mu">Plus que '+x.s+' en stock</span>':'')+'</div></button>'}
+function flash(){var T=Date.now(),o=[19920,25200,32400,43200];$("fl").innerHTML=[1,4,5,12].map(function(id,i){var x=P.filter(function(p){return p.id==id})[0];return x?card(x,T+o[i]*1e3):""}).join("")}
+function tick(){var n=Date.now();document.querySelectorAll(".tm").forEach(function(e){var r=Math.max(0,e.dataset.t-n),v=[Math.floor(r/864e5),Math.floor(r%864e5/36e5),Math.floor(r%36e5/6e4),Math.floor(r%6e4/1e3)];e.innerHTML=v.map(function(a,i){return '<b'+(i==3?' class="o"':'')+'>'+String(a).padStart(2,"0")+'</b>'}).join("")})}
+var S=[["Grande ouverture","Ventes de lancement","Acheter maintenant","Tous","📱🎧👔🎒"],["Artisanat béninois","Pièces uniques, faites à la main","Découvrir","Artisanat","🎭🖼️🧺"],["Électronique à prix doux","Écouteurs, batteries, ventilateurs","Voir l'électronique","Électronique","🔋🎧🌀"]];
+function hero(i){var s=S[i];$("hb").innerHTML='<div><h1><small>'+s[0]+'</small>'+s[1]+'</h1><p style="margin:12px 0 16px;color:var(--mute)">Livraison rapide. Paiement mobile money ou carte.</p><button class="btn" data-c="'+s[3]+'">'+s[2]+'</button></div><div class="art" aria-hidden="true">'+s[4]+'</div>';$("hd").innerHTML=S.map(function(_,j){return '<button data-h="'+j+'" class="'+(j==i?'on':'')+'" aria-label="Bannière '+(j+1)+'"></button>'}).join("")}
+function list(){
+var t=$("q").value.trim().toLowerCase(),m=+$("pm").value,r=+$("rm").value;$("pv").textContent=fmt(m);
+var l=P.filter(function(x){return (cat=="Tous"||x.c==cat)&&x.p<=m&&x.r>=r&&(!t||(x.n+x.c).toLowerCase().indexOf(t)>-1)});
+var s=$("so").value;if(s==1)l.sort(function(a,b){return a.p-b.p});if(s==2)l.sort(function(a,b){return b.p-a.p});if(s==3)l.sort(function(a,b){return b.r-a.r});
+$("h").textContent=cat=="Tous"?"Tous les articles":cat;$("cnt").textContent=l.length+" article"+(l.length>1?"s":"");
+$("g").innerHTML=l.length?l.map(function(x){return card(x)}).join(""):'<p>Aucun article ne correspond. Élargissez le prix maximum ou la note minimum.</p>'}
+function open(h){$("bx").className="box";$("bx").innerHTML=h;$("ov").classList.add("on")}
+function close(){$("ov").classList.remove("on")}
+function fiche(id){var x=P.filter(function(p){return p.id==id})[0];
+open('<div class="im" style="height:160px;display:grid;place-items:center;font-size:5rem;border-radius:10px;background:'+x.col+'">'+x.e+'</div><h2>'+x.n+'</h2><div class="st">'+stars(x.r)+' <span class="mu">'+x.r+' · '+x.v+' avis vérifiés</span></div><p>'+x.d+'</p><p class="mu">Composition : '+x.m+'</p><div class="pr" style="font-size:1.3rem">'+fmt(x.p)+'</div><p class="mu">'+(x.s<1?'Épuisé':x.s+' en stock')+'</p><div style="display:flex;gap:8px"><button class="btn" data-add="'+x.id+'"'+(x.s<1?' disabled':'')+'>Ajouter au panier</button><button class="btn alt" data-x>Fermer</button></div>')}
+function panier(){var ks=Object.keys(cart).filter(function(k){return cart[k]>0});
+if(!ks.length){open('<h2>Votre panier est vide</h2><p>Ajoutez un article pour commencer.</p><button class="btn" data-x>Continuer mes achats</button>');return}
+var tot=0,h='<div class="steps"><i class="on"></i><i></i><i></i></div><h2>Panier</h2>';
+ks.forEach(function(k){var x=P.filter(function(p){return p.id==k})[0];tot+=x.p*cart[k];h+='<div class="row"><span>'+x.e+' '+x.n+'<br><span class="mu">'+fmt(x.p)+'</span></span><span class="qty"><button data-q="'+k+'" data-d="-1" aria-label="Retirer un">−</button> '+cart[k]+' <button data-q="'+k+'" data-d="1" aria-label="Ajouter un">+</button></span></div>'});
+h+='<div class="row"><b>Total</b><b>'+fmt(tot)+'</b></div><p class="mu">Achat sans compte : aucune inscription requise.</p><div style="display:flex;gap:8px"><button class="btn" data-go="2">Passer la commande</button><button class="btn alt" data-x>Continuer</button></div>';open(h)}
+function coord(){open('<div class="steps"><i class="on"></i><i class="on"></i><i></i></div><h2>Vos coordonnées</h2><div class="f"><input id="c1" placeholder="Nom complet" autocomplete="name"><input id="c2" type="email" placeholder="E-mail (pour le reçu)" autocomplete="email"><input id="c3" type="tel" placeholder="Téléphone" autocomplete="tel"><input id="c4" placeholder="Adresse de livraison" autocomplete="street-address"><button class="btn" data-go="3">Continuer vers le paiement</button></div><p id="er" class="mu"></p>')}
+function loadP(){return fetch(CFG.API+"/products").then(function(r){return r.json()}).then(function(d){P=d.map(function(x){return{id:x.id,n:x.name,c:x.category,e:x.emoji,p:x.price,r:x.rating,v:x.reviews,d:x.description,m:x.composition,s:x.stock,col:"#f4f4f4"}});cats=["Tous"].concat(P.map(function(x){return x.c}).filter(function(c,i,a){return a.indexOf(c)==i}));nav();list();flash()}).catch(function(){$("g").innerHTML="<p>Impossible de charger les articles. Réessayez dans un instant.</p>"})}
+var cust={};
+function pay(){var tot=0;Object.keys(cart).forEach(function(k){tot+=P.filter(function(p){return p.id==k})[0].p*cart[k]});open('<div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i></div><h2>Paiement</h2><p>Montant à payer : <b>'+fmt(tot)+'</b></p><p class="mu">Mobile money ou carte bancaire, via KKiaPay.</p><button class="btn" data-go="4">Payer avec KKiaPay</button>')}
+function post(u,b){return fetch(CFG.API+u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}).then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.error||"Erreur");return d})})}
+function pay2(){var b=document.querySelector('[data-go="4"]');b.disabled=true;b.textContent="Préparation…";
+post("/orders",{customer:cust,items:Object.keys(cart).map(function(k){return{id:+k,qty:cart[k]}})}).then(function(o){cur=o.orderId;openKkiapayWidget({amount:o.amount,key:CFG.KKIAPAY_KEY,sandbox:CFG.SANDBOX,name:cust.name,email:cust.email,phone:cust.phone.replace(/\D/g,""),data:o.orderId,reason:"Commande Suppliers Window"})}).catch(function(e){b.disabled=false;b.textContent="Payer avec KKiaPay";alert(e.message)})}
+function onOk(r){if(!cur)return;var id=cur;post("/orders/"+id+"/pay",{transactionId:r.transactionId}).then(function(){done(id)}).catch(function(e){open('<h2>Paiement à vérifier</h2><p>'+e.message+' Contactez-nous avec la référence '+id.slice(0,8)+'.</p><button class="btn" data-x>Fermer</button>')})}
+function onKo(){open('<h2>Paiement non abouti</h2><p>Aucun montant n\'a été débité. Vous pouvez réessayer.</p><button class="btn" data-go="5">Réessayer</button>')}
+function done(id){cart={};cur=null;save();loadP();open('<h2>Merci pour votre commande</h2><p>Un e-mail de confirmation vous est envoyé.</p><a class="btn" style="display:inline-block;text-decoration:none" href="'+CFG.API+'/orders/'+id+'/receipt.pdf" target="_blank" rel="noopener">Télécharger le reçu (PDF)</a> <button class="btn alt" data-x>Retour à la boutique</button>')}
+document.addEventListener("click",function(e){var t=e.target.closest("button");if(!t)return;
+if(t.dataset.c){cat=t.dataset.c;nav();list()}
+else if(t.dataset.id)fiche(t.dataset.id);
+else if(t.dataset.add){cart[t.dataset.add]=(cart[t.dataset.add]||0)+1;save();panier()}
+else if(t.dataset.q){var k=t.dataset.q,x=P.filter(function(p){return p.id==k})[0];cart[k]=Math.max(0,Math.min(x.s,cart[k]+ +t.dataset.d));if(!cart[k])delete cart[k];save();panier()}
+else if(t.dataset.go==2)coord();
+else if(t.dataset.go==3){if(!$("c1").value||!/\S+@\S+/.test($("c2").value)||!$("c4").value){$("er").textContent="Renseignez votre nom, un e-mail valide et l'adresse de livraison.";return}cust={name:$("c1").value,email:$("c2").value,phone:$("c3").value,address:$("c4").value};pay()}
+else if(t.dataset.go==4)pay2();else if(t.dataset.go==5)pay();
+else if(t.dataset.x!==undefined)close();
+else if(t.dataset.soon)open('<h2>Bientôt disponible</h2><p>Les comptes clients et les favoris arrivent dans la version en ligne.</p><button class="btn" data-x>Fermer</button>');else if(t.dataset.h!==undefined)hero(+t.dataset.h);else if(t.id=="sbt"){list();document.getElementById("g").scrollIntoView({behavior:"smooth"})}else if(t.id=="cb"||t.id=="cb2")panier();
+else if(t.parentNode.id=="sug"){$("q").value=t.textContent;$("sug").style.display="none";list()}});
+$("ov").addEventListener("click",function(e){if(e.target==$("ov"))close()});
+$("q").addEventListener("input",function(){var t=this.value.trim().toLowerCase(),s=t?P.filter(function(x){return x.n.toLowerCase().indexOf(t)>-1}).slice(0,5):[];
+$("sug").style.display=s.length?"block":"none";$("sug").innerHTML=s.map(function(x){return '<button>'+x.n+'</button>'}).join("");list()});
+["pm","rm","so"].forEach(function(i){$(i).addEventListener("input",list)});
+$("nl").addEventListener("submit",function(e){e.preventDefault();$("nm").textContent="Merci, vous êtes inscrit.";e.target.reset()});
+nav();save();hero(0);setInterval(tick,1000);loadP();if(typeof addSuccessListener=="function"){addSuccessListener(onOk);addFailedListener(onKo)}
+</script>
+</body>
+</html>
