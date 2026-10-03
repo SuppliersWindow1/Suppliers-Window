@@ -9,6 +9,7 @@ const fmt=n=>Number(n).toLocaleString('fr-FR').replace(/\s/g,' ')+' FCFA';
 async function init(){
   await pool.query(`create table if not exists products(id serial primary key,name text not null,category text,emoji text,price int not null,rating real default 0,reviews int default 0,description text,composition text,stock int default 0);
   create table if not exists orders(id text primary key,status text not null,total int not null,name text,email text,phone text,address text,items jsonb,transaction_id text,created_at timestamptz default now());`);
+  await pool.query('alter table products add column if not exists subcategory text');
   if((await pool.query('select count(*)::int n from products')).rows[0].n===0){
     for(const p of require('./products')) await pool.query('insert into products(name,category,emoji,price,rating,reviews,description,composition,stock) values($1,$2,$3,$4,$5,$6,$7,$8,$9)',[p.name,p.category,p.emoji,p.price,p.rating,p.reviews,p.description,p.composition,p.stock]);
   }
@@ -81,8 +82,8 @@ app.get('/orders/:id/receipt.pdf',async(q,r)=>{
 // Administration (jeton dans l'en-tête Authorization: Bearer ...)
 app.get('/admin/orders',admin,async(q,r)=>r.json((await pool.query('select id,status,total,name,email,phone,address,items,created_at from orders order by created_at desc limit 200')).rows));
 app.post('/admin/products',admin,async(q,r)=>{
-  const p=q.body,a=[p.name,p.category,p.emoji,p.price,p.rating||0,p.reviews||0,p.description,p.composition,p.stock||0];
-  r.json((await(p.id?pool.query('update products set name=$1,category=$2,emoji=$3,price=$4,rating=$5,reviews=$6,description=$7,composition=$8,stock=$9 where id=$10 returning *',[...a,p.id]):pool.query('insert into products(name,category,emoji,price,rating,reviews,description,composition,stock) values($1,$2,$3,$4,$5,$6,$7,$8,$9) returning *',a))).rows[0]);
+  const p=q.body,a=[p.name,p.category,p.emoji,p.price,p.rating||0,p.reviews||0,p.description,p.composition,p.stock||0,p.subcategory||null];
+  r.json((await(p.id?pool.query('update products set name=$1,category=$2,emoji=$3,price=$4,rating=$5,reviews=$6,description=$7,composition=$8,stock=$9,subcategory=$10 where id=$11 returning *',[...a,p.id]):pool.query('insert into products(name,category,emoji,price,rating,reviews,description,composition,stock,subcategory) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) returning *',a))).rows[0]);
 });
 
 init().then(()=>app.listen(E.PORT||3000,()=>console.log('API prête'))).catch(e=>{console.error(e);process.exit(1)});
