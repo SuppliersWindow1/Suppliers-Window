@@ -1,5 +1,6 @@
 // Admin Suppliers Window : connexion + double authentification (TOTP) + rôles + produits + commandes + équipe.
 // Aucune dépendance en plus. Variables Railway : AUTH_SECRET (32 caractères minimum), ADMIN_EMAIL, ADMIN_PASSWORD.
+// Secours : ADMIN_RESET=1 réinitialise le compte super-admin (mot de passe + 2FA) au prochain démarrage. À retirer ensuite.
 const crypto=require('crypto');
 const E=process.env,SEC=E.AUTH_SECRET||'';
 const PERM={
@@ -28,8 +29,16 @@ module.exports=(app,pool)=>{
   if(SEC.length<32){console.error('AUTH_SECRET manquant (32 caractères minimum) : le panneau admin est désactivé.');return}
   pool.query(`create table if not exists staff(id serial primary key,email text unique not null,name text,role text not null,pass text not null,totp text,totp_on boolean default false,active boolean default true,created_at timestamptz default now())`)
   .then(async()=>{
-    if(!(await pool.query('select 1 from staff limit 1')).rowCount&&E.ADMIN_EMAIL&&E.ADMIN_PASSWORD)
-      await pool.query("insert into staff(email,name,role,pass) values($1,'Super-Admin','super',$2)",[E.ADMIN_EMAIL.toLowerCase(),await hash(E.ADMIN_PASSWORD)]);
+    const em=(E.ADMIN_EMAIL||'').trim().toLowerCase(),pw=(E.ADMIN_PASSWORD||'').trim();
+    if(!em||!pw){console.warn('staff: ADMIN_EMAIL ou ADMIN_PASSWORD absent, aucun compte de départ créé.');return}
+    const n=(await pool.query('select count(*)::int n from staff')).rows[0].n;
+    if(!n){
+      await pool.query("insert into staff(email,name,role,pass) values($1,'Super-Admin','super',$2)",[em,await hash(pw)]);
+      console.log('staff: super-admin créé pour',em);
+    }else if(E.ADMIN_RESET==='1'){
+      await pool.query("insert into staff(email,name,role,pass,active) values($1,'Super-Admin','super',$2,true) on conflict(email) do update set pass=$2,role='super',active=true,totp=null,totp_on=false",[em,await hash(pw)]);
+      console.log('staff: super-admin réinitialisé pour',em,'(pensez à supprimer ADMIN_RESET)');
+    }
   }).catch(e=>console.error('staff',e.message));
 
   const auth=perm=>W(async(q,r,n)=>{
@@ -44,10 +53,11 @@ module.exports=(app,pool)=>{
   app.get('/panel',(q,r)=>{r.set({'Cache-Control':'no-store','X-Frame-Options':'DENY','Content-Security-Policy':"default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'"});r.sendFile(__dirname+'/panel.html')});
 
   app.post('/panel/api/login',W(async(q,r)=>{
-    const{email='',password=''}=q.body||{},k=String(email).toLowerCase()+'|'+q.ip;
+    const b=q.body||{},email=String(b.email||'').trim().toLowerCase(),password=String(b.password||''),k=email+'|'+q.ip;
     if(lim(k))return r.status(429).json({error:'Trop de tentatives. Réessayez dans 10 minutes.'});
-    const u=(await pool.query('select * from staff where email=$1',[String(email).toLowerCase()])).rows[0];
-    if(!u||!u.active||!(await check(password,u.pass))){fail(k);return r.status(401).json({error:'Identifiants incorrects.'})}
+    const u=(await pool.query('select * from staff where email=$1',[email])).rows[0];
+    const why=!u?'e-mail inconnu':!u.active?'compte désactivé':!(await check(password,u.pass))?'mot de passe différent':null;
+    if(why){console.log('login refusé :',why,'|',email);fail(k);return r.status(401).json({error:'Identifiants incorrects.'})}
     let uri=null,secret=null;
     if(!u.totp_on){
       secret=u.totp||b32(crypto.randomBytes(20));
@@ -94,7 +104,7 @@ module.exports=(app,pool)=>{
   app.post('/panel/api/staff',auth('staff:manage'),W(async(q,r)=>{
     const b=q.body||{};
     if(!/\S+@\S+/.test(b.email||'')||!PERM[b.role]||String(b.password||'').length<10)return r.status(400).json({error:'E-mail, rôle et mot de passe (10 caractères minimum) requis.'});
-    try{r.json((await pool.query('insert into staff(email,name,role,pass) values($1,$2,$3,$4) returning id,email,name,role,active,totp_on',[b.email.toLowerCase(),b.name||'',b.role,await hash(b.password)])).rows[0])}
+    try{r.json((await pool.query('insert into staff(email,name,role,pass) values($1,$2,$3,$4) returning id,email,name,role,active,totp_on',[b.email.trim().toLowerCase(),b.name||'',b.role,await hash(b.password)])).rows[0])}
     catch(e){r.status(409).json({error:'Cet e-mail existe déjà.'})}
   }));
   app.patch('/panel/api/staff/:id',auth('staff:manage'),W(async(q,r)=>{
