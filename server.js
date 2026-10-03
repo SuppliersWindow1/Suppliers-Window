@@ -86,4 +86,5 @@ app.post('/admin/products',admin,async(q,r)=>{
   r.json((await(p.id?pool.query('update products set name=$1,category=$2,emoji=$3,price=$4,rating=$5,reviews=$6,description=$7,composition=$8,stock=$9,subcategory=$10 where id=$11 returning *',[...a,p.id]):pool.query('insert into products(name,category,emoji,price,rating,reviews,description,composition,stock,subcategory) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) returning *',a))).rows[0]);
 });
 
+require('./staff')(app,pool); // panneau admin (/panel)
 init().then(()=>app.listen(E.PORT||3000,()=>console.log('API prête'))).catch(e=>{console.error(e);process.exit(1)});

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><meta name="robots" content="noindex">
+<title>Admin – Suppliers Window</title>
+<style>
+:root{--a:#ee6828;--ink:#1c1c24;--mu:#6b6f7b;--line:#e6e8ee;--soft:#f3f4f8}
+*{box-sizing:border-box}html,body{background:#fff;color-scheme:light}
+body{margin:0;font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink)}
+button,input,select,textarea{font:inherit}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line)}
+header span{font-size:.85rem;color:var(--mu)}
+nav{display:flex;gap:6px;padding:10px 16px;background:var(--a);overflow-x:auto}
+nav button{background:none;border:0;color:#fff;font-weight:600;padding:8px 14px;border-radius:999px}
+nav button.on{background:#fff;color:var(--a)}
+main{max-width:900px;margin:0 auto;padding:16px}
+.box{max-width:380px;margin:8vh auto;padding:0 16px;display:grid;gap:12px}
+.box h1{margin:0}
+label{display:grid;gap:4px;font-size:.85rem;color:var(--mu)}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)}
+.b{display:inline-block;background:var(--a);color:#fff;border:0;border-radius:10px;padding:11px 16px;font-weight:600;text-decoration:none;cursor:pointer}
+.b.alt{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.l{background:none;border:0;color:var(--a);font-weight:600}
+.er{color:#c0261b;min-height:1.2em;margin:0}.mu{color:var(--mu)}
+.key{font:700 1.05rem monospace;word-break:break-all;background:var(--soft);padding:6px 8px;border-radius:8px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px}
+.chips button{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px}
+.chips button.on{background:var(--a);border-color:var(--a);color:#fff}
+.card{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;display:grid;gap:8px}
+.top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.tag{background:#fde6d9;color:#b8480f;border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:600}
+.act{display:flex;gap:8px;flex-wrap:wrap}ul{margin:0;padding-left:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:520px){.grid2{grid-template-columns:1fr}}
+</style></head><body><div id="app"></div>
+<script>
+var A="/panel/api",T=sessionStorage.getItem("t"),ME=JSON.parse(sessionStorage.getItem("me")||"null"),V={t:"commandes",f:""},PL=[];
+var $=function(i){return document.getElementById(i)};
+var RL={super:"Super-Admin",stock:"Gestionnaire de stock",support:"Agent support",compta:"Comptable"};
+var ST={pending:"En attente de paiement",paid:"À préparer",paid_stock_issue:"À vérifier (stock)",shipped:"Expédié",delivered:"Livré",returned:"Retourné"};
+var FT=[["","Toutes"],["pending","En attente de paiement"],["prepare","À préparer"],["shipped","Expédié"],["delivered","Livré"],["returned","Retourné"]];
+var CATS=["Mode & Accessoires","Électronique & Tech","Beauté & Santé"];
+var SUB=["Homme > Vêtements","Homme > Chaussures","Homme > Accessoires & Sacs","Femme > Vêtements","Femme > Chaussures","Femme > Accessoires & Sacs","Enfant > Bébé 0-24m","Enfant > Fille 2-14 ans","Enfant > Garçon 2-14 ans","Enfant > Accessoires","Informatique","Téléphonie & Audio","Accessoires Tech","Beauté > Soins du Visage","Beauté > Soins du Corps & Cheveux","Beauté > Maquillage","Santé et bien-être > Compléments alimentaires et nutrition","Santé et bien-être > Bien-être et sommeil","Santé et bien-être > Premiers secours et hygiène","Santé et bien-être > Matériel de santé"];
+function E(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function can(p){return ME&&ME.perms.indexOf(p)>-1}
+function api(p,o){o=o||{};var h={"Content-Type":"application/json"};if(T)h.Authorization="Bearer "+T;
+return fetch(A+p,{method:o.m||"GET",headers:h,body:o.b?JSON.stringify(o.b):undefined}).then(function(r){return r.json().then(function(d){if(r.status==401&&T){out();throw new Error(d.error)}if(!r.ok)throw new Error(d.error||"Erreur");return d})})}
+function out(){T=null;ME=null;sessionStorage.clear();login()}
+function login(msg){$("app").innerHTML='<form id="lf" class="box"><h1>Suppliers Window<span style="color:var(--a)">.</span></h1><p class="mu" style="margin:0">Espace équipe</p><label>E-mail<input id="em" type="email" autocomplete="username" required></label><label>Mot de passe<input id="pw" type="password" autocomplete="current-password" required></label><button class="b">Se connecter</button><p class="er" id="er">'+E(msg||"")+'</p></form>';
+$("lf").onsubmit=function(e){e.preventDefault();api("/login",{m:"POST",b:{email:$("em").value,password:$("pw").value}}).then(code).catch(function(x){$("er").textContent=x.message})}}
+function code(d){$("app").innerHTML='<form id="cf" class="box"><h1>Double authentification</h1>'+(d.enroll?'<p>Première connexion : dans Google Authenticator, touchez + puis « Saisir une clé de configuration », et entrez cette clé.</p><p class="key">'+E(d.secret)+'</p><p><a href="'+E(d.uri)+'">Ouvrir dans l’application</a></p><p>Puis saisissez le code à 6 chiffres affiché.</p>':'<p>Saisissez le code à 6 chiffres de votre application.</p>')+'<input id="cd" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required><button class="b">Valider</button><p class="er" id="er"></p></form>';
+$("cf").onsubmit=function(e){e.preventDefault();api("/totp",{m:"POST",b:{tmp:d.tmp,code:$("cd").value}}).then(function(r){T=r.token;ME=r.me;sessionStorage.setItem("t",T);sessionStorage.setItem("me",JSON.stringify(ME));shell()}).catch(function(x){$("er").textContent=x.message})}}
+function shell(){var tabs=[["commandes","Commandes","orders:read"],["produits","Produits","products:read"],["equipe","Équipe","staff:manage"]].filter(function(t){return can(t[2])});
+if(!tabs.some(function(t){return t[0]==V.t}))V.t=tabs[0][0];
+$("app").innerHTML='<header><b>Suppliers Window<span style="color:var(--a)">.</span></b><span>'+E(ME.name||ME.email)+' · '+RL[ME.role]+' <button class="l" id="lo">Quitter</button></span></header><nav>'+tabs.map(function(t){return '<button data-t="'+t[0]+'" class="'+(V.t==t[0]?"on":"")+'">'+t[1]+'</button>'}).join("")+'</nav><main id="mn"></main>';
+$("lo").onclick=out;document.querySelectorAll("nav button").forEach(function(b){b.onclick=function(){V.t=b.dataset.t;shell()}});({commandes:orders,produits:prods,equipe:team})[V.t]()}
+function orders(){$("mn").innerHTML='<div class="chips">'+FT.map(function(f){return '<button data-f="'+f[0]+'" class="'+(V.f==f[0]?"on":"")+'">'+f[1]+'</button>'}).join("")+'</div><div id="ol">Chargement…</div>';
+document.querySelectorAll(".chips button").forEach(function(b){b.onclick=function(){V.f=b.dataset.f;orders()}});
+api("/orders?status="+V.f).then(function(o){var w=can("orders:status");
+$("ol").innerHTML=o.length?o.map(function(x){var nx=w?(x.status=="paid"||x.status=="paid_stock_issue"?["shipped","Marquer expédié"]:x.status=="shipped"?["delivered","Marquer livré"]:null):null,rt=w&&(x.status=="shipped"||x.status=="delivered");
+return '<div class="card"><div class="top"><b>#'+E(x.id.slice(0,8))+'</b><span class="tag">'+E(ST[x.status]||x.status)+'</span></div><div>'+E(x.name)+' · '+E(x.phone||x.email)+'</div><div class="mu">'+E(x.address)+'</div><ul>'+(x.items||[]).map(function(i){return '<li>'+E(i.qty)+' × '+E(i.name)+'</li>'}).join("")+'</ul>'+(x.total!=null?'<b>'+Number(x.total).toLocaleString("fr-FR")+' F</b>':'')+'<div class="act">'+(nx?'<button class="b" data-id="'+x.id+'" data-s="'+nx[0]+'">'+nx[1]+'</button>':'')+(rt?'<button class="b alt" data-id="'+x.id+'" data-s="returned">Marquer retourné</button>':'')+'<a class="b alt" href="/orders/'+x.id+'/receipt.pdf" target="_blank" rel="noopener">Facture PDF</a></div></div>'}).join(""):'<p class="mu">Aucune commande.</p>';
+document.querySelectorAll("[data-s]").forEach(function(b){b.onclick=function(){api("/orders/"+b.dataset.id+"/status",{m:"PATCH",b:{status:b.dataset.s}}).then(orders).catch(function(e){alert(e.message)})}})}).catch(function(e){$("ol").textContent=e.message})}
+function prods(){$("mn").innerHTML=(can("products:write")?'<button class="b" id="np">+ Nouveau produit</button>':'')+'<input id="sq" placeholder="Rechercher un produit…" style="margin:12px 0"><div id="pf"></div><div id="pl">Chargement…</div>';
+$("sq").oninput=pl;if($("np"))$("np").onclick=function(){pform({})};api("/products").then(function(p){PL=p;pl()}).catch(function(e){$("pl").textContent=e.message})}
+function pl(){var q=$("sq").value.toLowerCase(),f=PL.filter(function(p){return(p.name+" "+(p.category||"")+" "+(p.subcategory||"")).toLowerCase().indexOf(q)>-1}),w=can("products:write");
+$("pl").innerHTML=f.slice(0,50).map(function(p){return '<div class="card"><div class="top"><b>'+E(p.emoji||"")+' '+E(p.name)+'</b><span>'+Number(p.price).toLocaleString("fr-FR")+' F</span></div><div class="mu">'+E(p.category||"—")+(p.subcategory?' › '+E(p.subcategory):'')+' · Stock : '+E(p.stock)+'</div>'+(w?'<div class="act"><button class="b alt" data-e="'+p.id+'">Modifier</button></div>':'')+'</div>'}).join("")+(f.length>50?'<p class="mu">50 premiers résultats sur '+f.length+' : affinez la recherche.</p>':'');
+document.querySelectorAll("[data-e]").forEach(function(b){b.onclick=function(){pform(PL.filter(function(p){return p.id==b.dataset.e})[0])}})}
+function pform(p){var o=CATS.slice();if(p.category&&o.indexOf(p.category)<0)o.push(p.category);
+$("pf").innerHTML='<form id="f" class="card"><b>'+(p.id?"Modifier":"Nouveau")+' produit</b><label>Nom<input id="fn" required value="'+E(p.name)+'"></label><div class="grid2"><label>Catégorie<select id="fc"><option value="">—</option>'+o.map(function(c){return '<option'+(c==p.category?" selected":"")+'>'+E(c)+'</option>'}).join("")+'</select></label><label>Sous-catégorie<input id="fs" list="sl" value="'+E(p.subcategory)+'"></label></div><datalist id="sl">'+SUB.map(function(s){return '<option value="'+E(s)+'">'}).join("")+'</datalist><div class="grid2"><label>Prix (F)<input id="fp" type="number" min="0" required value="'+E(p.price)+'"></label><label>Stock<input id="fk" type="number" min="0" value="'+E(p.stock||0)+'"></label></div><label>Emoji (affiché si pas de photo)<input id="fe" value="'+E(p.emoji)+'"></label><label>Description<textarea id="fd" rows="3">'+E(p.description)+'</textarea></label><label>Composition<input id="fm" value="'+E(p.composition)+'"></label><div class="act"><button class="b">Enregistrer</button><button type="button" class="b alt" id="fx">Annuler</button></div><p class="er" id="er"></p></form>';
+$("fx").onclick=function(){$("pf").innerHTML=""};$("f").scrollIntoView({behavior:"smooth"});
+$("f").onsubmit=function(e){e.preventDefault();api("/products",{m:"POST",b:{id:p.id,name:$("fn").value,category:$("fc").value,subcategory:$("fs").value,price:$("fp").value,stock:$("fk").value,emoji:$("fe").value,description:$("fd").value,composition:$("fm").value}}).then(prods).catch(function(x){$("er").textContent=x.message})}}
+function team(){$("mn").innerHTML='<form id="tf" class="card"><b>Ajouter un membre</b><input id="te" type="email" placeholder="E-mail" required><input id="tn" placeholder="Nom"><select id="tr">'+Object.keys(RL).map(function(k){return '<option value="'+k+'">'+RL[k]+'</option>'}).join("")+'</select><input id="tp" type="password" placeholder="Mot de passe provisoire (10 caractères min.)" minlength="10" required><button class="b">Créer</button><p class="er" id="er"></p></form><div id="tl">Chargement…</div>';
+$("tf").onsubmit=function(e){e.preventDefault();api("/staff",{m:"POST",b:{email:$("te").value,name:$("tn").value,role:$("tr").value,password:$("tp").value}}).then(team).catch(function(x){$("er").textContent=x.message})};
+api("/staff").then(function(s){$("tl").innerHTML=s.map(function(u){return '<div class="card"><div class="top"><b>'+E(u.name||u.email)+'</b><span class="tag">'+(u.active?"Actif":"Désactivé")+'</span></div><div class="mu">'+E(u.email)+' · 2FA '+(u.totp_on?"activée":"non configurée")+'</div><select data-r="'+u.id+'">'+Object.keys(RL).map(function(k){return '<option value="'+k+'"'+(k==u.role?" selected":"")+'>'+RL[k]+'</option>'}).join("")+'</select><div class="act"><button class="b alt" data-a="'+u.id+'" data-v="'+(u.active?0:1)+'">'+(u.active?"Désactiver":"Réactiver")+'</button><button class="b alt" data-2="'+u.id+'">Réinitialiser la 2FA</button><button class="b alt" data-pw="'+u.id+'">Nouveau mot de passe</button></div></div>'}).join("");
+var P=function(id,b){api("/staff/"+id,{m:"PATCH",b:b}).then(team).catch(function(e){alert(e.message)})};
+document.querySelectorAll("[data-r]").forEach(function(x){x.onchange=function(){P(x.dataset.r,{role:x.value})}});
+document.querySelectorAll("[data-a]").forEach(function(x){x.onclick=function(){P(x.dataset.a,{active:x.dataset.v=="1"})}});
+document.querySelectorAll("[data-2]").forEach(function(x){x.onclick=function(){if(confirm("Réinitialiser la double authentification de ce membre ?"))P(x.dataset["2"],{reset2fa:true})}});
+document.querySelectorAll("[data-pw]").forEach(function(x){x.onclick=function(){var w=prompt("Nouveau mot de passe (10 caractères minimum) :");if(w)P(x.dataset.pw,{password:w})}})}).catch(function(e){$("tl").textContent=e.message})}
+if(T&&ME)shell();else login();
+</script></body></html>
