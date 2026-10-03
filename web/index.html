@@ -278,9 +278,9 @@ function cm(){mega(null);if($("side").className.indexOf("on")>-1){$("side").clas
 function promo(){cm();if(view=="cat"){PF=1;goTo(null,1)}else flashGo()}
 function sh(){$("sug").style.display="none";$("q").setAttribute("aria-expanded","false")}
 function hl(s,k){var i=nz(s).indexOf(k);return i<0?E(s):E(s.slice(0,i))+"<mark>"+E(s.slice(i,i+k.length))+"</mark>"+E(s.slice(i+k.length))}
-function sug(){var q=$("q").value.trim(),t=nz(q),b=$("sug");if(!t){sh();return}var w=t.split(/\s+/);
-var cs=FLAT.filter(function(n){var h=nz(n.p);return w.every(function(k){return h.indexOf(k)>-1})}).slice(0,3),
-ps=P.filter(function(x){return mt(x,t)}).sort(function(a,c){return nz(a.n).indexOf(w[0])-nz(c.n).indexOf(w[0])}).slice(0,5);
+function sug(){var q=$("q").value.trim(),t=nz(q),b=$("sug"),sc=view=="cat"&&cat!="Tous";if(!t){sh();return}var w=t.split(/\s+/);
+var cs=FLAT.filter(function(n){var h=nz(n.p);return (!sc||h.indexOf(nz(cat)+" > ")==0)&&w.every(function(k){return h.indexOf(k)>-1})}).slice(0,3),
+ps=P.filter(function(x){return (!sc||inC(x))&&mt(x,t)}).sort(function(a,c){return nz(a.n).indexOf(w[0])-nz(c.n).indexOf(w[0])}).slice(0,5);
 b.innerHTML=(cs.length||ps.length)?cs.map(function(n){return '<button role="option" data-sc="'+E(n.p)+'"><span>'+hl(n.p.split(" > ").slice(1).join(" › "),w[0])+'</span><small>Catégorie</small></button>'}).join("")+ps.map(function(x){return '<button role="option" data-sg="'+x.id+'"><span>'+hl(x.n,w[0])+'</span><small>'+fF(x.p)+'</small></button>'}).join("")+'<button role="option" data-all="1">Voir tous les résultats pour « '+E(q)+' »</button>':'<p class="mu" style="padding:12px 14px">Aucun résultat pour « '+E(q)+' »</p>';
 b.style.display="block";$("q").setAttribute("aria-expanded","true")}
 function sugClick(t){sh();if(t.dataset.sg){fiche(t.dataset.sg);return}if(t.dataset.sc){$("q").value="";goTo(t.dataset.sc,1)}else searchGo()}
@@ -332,7 +332,7 @@ function route(){var m=location.hash.match(/^#\/c\/([^\/]+)\/(\d+)$/),c=null;
 try{if(m)c=decodeURIComponent(m[1])}catch(e){}
 if(c){cat=c;pg=Math.max(1,+m[2]);view="cat"}else{cat="Tous";pg=1;view="home"}
 close();document.body.classList.toggle("cp",view=="cat");
-document.title=view=="cat"?ttl(cat)+" – Suppliers Window":T0;
+document.title=view=="cat"?ttl(cat)+" – Suppliers Window":T0;$("q").placeholder=view=="cat"&&cat!="Tous"?"Rechercher dans "+ttl(cat)+"…":"Rechercher un article…";
 list();
 if(PF){PF=0;NS=0;flashGo()}else if(NS){NS=0}else{window.scrollTo(0,0);if(RT)$("h").focus({preventScroll:true})}
 RT=1}
